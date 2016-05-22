@@ -29,31 +29,15 @@ import com.google.gson.JsonObject;
 @Produces(MediaType.APPLICATION_JSON)
 
 public class RestSkole {
-	private SkolaModel m = new SkolaModel();
-	private LinkedList<Skola> skole;
-	Gson gson;
-
-	public RestSkole(LinkedList<Skola> skole, LinkedList<PodrucjeRada> listaSvihPodrucja, Gson gson) {
-		try {
-			this.skole = (LinkedList<Skola>) m.vratiSkole();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		this.gson = gson;
-	}
-
+	private static SkolaModel m = new SkolaModel();
+	private static LinkedList<Skola> skole = (LinkedList<Skola>) m.vratiSkole();
+	
 	public LinkedList<Skola> getSkole() {
 		return skole;
 	}
 
 	public void setSkole(LinkedList<Skola> skole) {
 		this.skole = skole;
-	}
-
-	public RestSkole(LinkedList<Skola> skole) {
-		this.skole = skole;
-		gson = new GsonBuilder().create();
 	}
 	
 	@GET 

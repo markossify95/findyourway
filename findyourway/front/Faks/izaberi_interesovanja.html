@@ -1,0 +1,276 @@
+<html>
+<head>
+  <meta charset='utf-8'>
+<style>
+     html, body, #map-canvas {
+       height: 100%;
+       margin: 0;
+       padding: 0;
+     }
+     #legend {
+       color: black;
+       background: white;
+       padding: 10px;
+     }
+
+   </style>
+   <link href="css/bootstrap.min.css" rel="stylesheet">
+
+
+   <link href="css/index.css" rel="stylesheet">
+
+<script src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
+<script src="markerclusterer.js"></script>
+<script>
+
+
+
+function initialize() {
+
+ var center = new google.maps.LatLng(44.1, 20.6);
+
+ var options = {
+   'zoom': 7,
+   'center': center
+ };
+
+ var map = new google.maps.Map(document.getElementById("map-canvas"), options);
+ map.infowindow = new google.maps.InfoWindow({
+     content: ""
+ });
+ var markers = [];
+
+
+ var xmlhttp = new XMLHttpRequest();
+ var url = "http://opendata.mpn.gov.rs/get.php?dataset=maticne_izdvojena&lang=en&term=json";
+
+ xmlhttp.onreadystatechange = function() {
+   if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+       var myArr = JSON.parse(xmlhttp.responseText);
+       markers=myFunction(myArr,markers,map);
+   }
+ }
+ xmlhttp.open("GET", url, true);
+ xmlhttp.send();
+
+ map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(
+ document.getElementById('legend'));
+
+}
+
+google.maps.event.addDomListener(window, 'load', initialize);
+
+
+function myFunction(arr,markers,map) {
+
+   for(var i=0;i<arr.length;i++) {
+     try {
+       var gx=parseFloat(arr[i]["gps"].split(",")[0])+Math.random()*0.00006;
+       var gy=parseFloat(arr[i]["gps"].split(",")[1])+Math.random()*0.00006;
+
+     stip="";
+     var ihtml='https://chart.googleapis.com/chart?chst=d_map_xpin_letter&chld=pin_star';
+
+     if (arr[i]["lokacija"]!='0') ihtml='https://chart.googleapis.com/chart?chst=d_map_xpin_letter&chld=pin';
+
+
+     switch(arr[i]["vrsta_id"]) {
+       case "1":
+         stip="основна школа";
+         ihtml=ihtml+'|O|00FF00|000000';
+         break;
+       case "2":
+         stip="средња школа";
+         ihtml=ihtml+'|S|0000FF|000000';
+         break;
+       case "3":
+         stip="приватна основна школа";
+         ihtml=ihtml+'|O|00FF00|000000';
+         break;
+       case "4":
+         stip="приватна средња школа";
+         ihtml=ihtml+'|S|0000FF|000000';
+         break;
+       case "5":
+         stip="основна и средња школа са домом ученика";
+         ihtml=ihtml+'|D|00FFFF|000000';
+         break;
+       case "6":
+         stip="музичка основна и средња школа";
+         ihtml=ihtml+'|D|FF0000|000000';
+         break;
+       case "7":
+         stip="основна и средња школа";
+         ihtml=ihtml+'|D|00FFFF|000000';
+         break;
+       case "8":
+         stip="приватна основна и средња школа";
+         ihtml=ihtml+'|D|00FFFF|000000';
+         break;
+       case "9":
+         stip="основна музичка школа";
+         ihtml=ihtml+'|O|FF0000|000000';
+        break;
+       case "10":
+         stip="балетска школа";
+         ihtml=ihtml+'|S|FF0000|000000';
+         break;
+       case "14":
+         stip="средња школа са домом ученика";
+         ihtml=ihtml+'|S|0000FF|000000';
+         break;
+     }
+
+     var sinfo="";
+     if (arr[i]["lokacija"]!='0') sinfo="Издвојено одељење школе:<br>";
+     sinfo=sinfo+"<h3>" + arr[i]["naziv_skole"] +  '</h3>'+ arr[i]["adresa"] + ", " + arr[i]["mesto"] + ", " + arr[i]["postanski_broj"] + "<br>Општина: " + arr[i]["naziv_opstina_cir"] + "<br>Тел: " + arr[i]["tel"] + "<br>Факс: " + arr[i]["fax"] + "<br><br>Врста школе: "+stip+"<br><br>Одељења: " + arr[i]["broj_odeljenja"] + "<br><br>Интернет страница: <a href='" + arr[i]["www"]+"'>"+arr[i]["www"]+"</a>";
+
+
+     var myLatlng = new google.maps.LatLng(gx,gy);
+     var marker = new google.maps.Marker({
+       position: myLatlng,
+       title: arr[i]["naziv_skole"],
+ icon: ihtml,
+       info: sinfo
+     });
+
+     google.maps.event.addListener(marker,'click', function(){
+ map.infowindow.setContent(this.info);
+       map.infowindow.open(map,this);
+     });
+     markers.push(marker);
+     } catch (err) {}
+   }
+
+
+   var markerCluster = new MarkerClusterer(map, markers,{
+         maxZoom: 10,
+         gridSize: null,
+         styles: null
+       });
+
+   return markers;
+}
+
+
+
+</script>
+</head>
+
+<body>
+
+    <div class="col-md-1">
+      <div class="boxovi">
+        <legend>PREDMETI</legend>
+    <div class="checkbox">
+      <label>
+        <input type="checkbox" value="">
+        Srpski
+      </label>
+    </div>
+    <div class="checkbox">
+      <label>
+        <input type="checkbox" value="">
+        Matematika
+      </label>
+    </div>
+    <div class="checkbox">
+      <label>
+        <input type="checkbox" value="">
+      Engleski
+      </label>
+    </div>
+    <div class="checkbox">
+      <label>
+        <input type="checkbox" value="">
+        Likovno
+      </label>
+    </div>
+    <div class="checkbox">
+      <label>
+        <input type="checkbox" value="">
+      Muzicko
+      </label>
+    </div>
+    <div class="checkbox">
+      <label>
+        <input type="checkbox" value="">
+        Istorija
+      </label>
+    </div>
+    <div class="checkbox">
+      <label>
+        <input type="checkbox" value="">
+        Geografija
+      </label>
+    </div>
+    <div class="checkbox">
+      <label>
+        <input type="checkbox" value="">
+      Fizika
+      </label>
+    </div>
+    <div class="checkbox">
+      <label>
+        <input type="checkbox" value="">
+        Biologija
+      </label>
+    </div>
+    <div class="checkbox">
+      <label>
+        <input type="checkbox" value="">
+      Hemija
+      </label>
+    </div>
+    <div class="checkbox">
+      <label>
+        <input type="checkbox" value="">
+        Tehnicko
+      </label>
+    </div>
+    <div class="checkbox">
+      <label>
+        <input type="checkbox" value="">
+        Fizicko
+      </label>
+    </div>
+    <div class="checkbox">
+      <label>
+        <input type="checkbox" value="">
+        Gradjansko
+      </label>
+    </div>
+    <div class="checkbox">
+      <label>
+        <input type="checkbox" value="">
+        Veroanuka
+      </label>
+    </div>
+  </div>
+
+</div>
+<div id="map-canvas"></div>
+<div id="legend">
+ <img src="https://chart.googleapis.com/chart?chst=d_map_xpin_letter&chld=pin_star||FFFFFF|000000" /> - матична школа <br>
+ <img src="https://chart.googleapis.com/chart?chst=d_map_xpin_letter&chld=pin||FFFFFF|000000" /> - издвојено одељење <br>
+ <hr>
+ <img src="https://chart.googleapis.com/chart?chst=d_map_xpin_letter&chld=pin||00FF00|000000" /> - основна <br>
+ <img src="https://chart.googleapis.com/chart?chst=d_map_xpin_letter&chld=pin||0000FF|000000" /> - средња <br>
+ <img src="https://chart.googleapis.com/chart?chst=d_map_xpin_letter&chld=pin||00FFFF|000000" /> - основна и средња <br>
+ <img src="https://chart.googleapis.com/chart?chst=d_map_xpin_letter&chld=pin||FF0000|000000" /> - музичка или балетска <br>
+
+</div>
+
+<script>
+ (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+ (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+ m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+ })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ ga('create', 'UA-2441426-15', 'auto');
+ ga('send', 'pageview');
+
+</script>
+
+</body>
+</html>
