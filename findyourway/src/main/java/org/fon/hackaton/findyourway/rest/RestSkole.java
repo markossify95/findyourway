@@ -1,5 +1,10 @@
 package org.fon.hackaton.findyourway.rest;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.LinkedList;
 
 import javax.ws.rs.Consumes;
@@ -11,6 +16,7 @@ import javax.ws.rs.core.MediaType;
 
 import org.fon.hackaton.findyourway.domen.PodrucjeRada;
 import org.fon.hackaton.findyourway.domen.Skola;
+import org.fon.hackaton.findyourway.model.SkolaModel;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -23,22 +29,18 @@ import com.google.gson.JsonObject;
 @Produces(MediaType.APPLICATION_JSON)
 
 public class RestSkole {
+	private SkolaModel m = new SkolaModel();
 	private LinkedList<Skola> skole;
-	private LinkedList<PodrucjeRada> listaSvihPodrucja;
 	Gson gson;
 
 	public RestSkole(LinkedList<Skola> skole, LinkedList<PodrucjeRada> listaSvihPodrucja, Gson gson) {
-		this.skole = skole;
-		this.listaSvihPodrucja = listaSvihPodrucja;
+		try {
+			this.skole = (LinkedList<Skola>) m.vratiSkole();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		this.gson = gson;
-	}
-
-	public LinkedList<PodrucjeRada> getListaSvihPodrucja() {
-		return listaSvihPodrucja;
-	}
-
-	public void setListaSvihPodrucja(LinkedList<PodrucjeRada> listaSvihPodrucja) {
-		this.listaSvihPodrucja = listaSvihPodrucja;
 	}
 
 	public LinkedList<Skola> getSkole() {
